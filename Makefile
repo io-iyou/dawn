@@ -1,5 +1,5 @@
 # Variables
-SERVICE=backend
+SERVICE=dawn
 IMG_HUB?=docker.io/jmzwcn
 # Version information
 VERSION=1.0.0
@@ -17,9 +17,7 @@ else
 endif
 
 prepare:
-#	go install github.com/freightio/api-gateway/plugin/...
-	go get github.com/gogo/protobuf/protoc-gen-gogofaster
-#	go get github.com/golang/protobuf/protoc-gen-go
+	@go get github.com/gogo/protobuf/protoc-gen-gogofaster
 	@-docker swarm init
 	@-docker network create --driver=overlay devel
 
@@ -57,6 +55,14 @@ push:image
 run:image
 	@-docker service rm $(SERVICE) > /dev/null 2>&1  || true	
 	@docker service create --name $(SERVICE) --network devel $(IMG_HUB)/$(SERVICE):$(TAG)
+
+envoy:
+	docker build -t $(IMG_HUB)/envoy:$(TAG) -f envoy.Dockerfile .
+#	docker push $(IMG_HUB)/envoy:$(TAG)
+	docker service create --name envoy --network devel -p 8080:8080 $(IMG_HUB)/envoy:$(TAG)
+
+mysql:
+	-docker service create --name mysql --network devel --mount type=bind,source=/home/daniel/.mysqldata,destination=/var/lib/mysql -e MYSQL_ROOT_PASSWORD=123456 -e MYSQL_DATABASE=iyou mysql:5.7.24
 
 test:
 	go test -cover ./...

@@ -4,8 +4,8 @@ import (
 	"log"
 	"net"
 
-	impl "github.com/freightio/backend/internal/impl/service"
-	pb "github.com/freightio/backend/service/sdk/go"
+	impl "github.com/iyou/dawn/internal/impl/service"
+	pb "github.com/iyou/dawn/service/sdk/go"
 	"google.golang.org/grpc"
 )
 
@@ -19,12 +19,9 @@ func main() {
 		log.Fatalf("failed to listen: %v", err)
 	}
 	s := grpc.NewServer()
-	pb.RegisterVehiclesServer(s, &impl.VehicleImpl{})
-	pb.RegisterOrdersServer(s, &impl.OrderServerImpl{})
-	pb.RegisterUsersServer(s, &impl.UserServerImpl{})
-	pb.RegisterWalletsServer(s, &impl.WalletServerImpl{})
-	pb.RegisterCertificationsServer(s, &impl.CertificationImpl{})
+	pb.RegisterArticlesServer(s, &impl.ArticlesImpl{})
 
+	log.Println("begin..." + port)
 	if err := s.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v", err)
 	}

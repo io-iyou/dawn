@@ -7,8 +7,6 @@ import (
 	"log"
 	"reflect"
 
-	//"sinaclouds/fx/common/log"
-	//"sinaclouds/fx/core/config"
 	"strings"
 	"time"
 
@@ -16,22 +14,17 @@ import (
 )
 
 const (
-	dburl = "root:123456@tcp(mysql:3306)/freight"
+	dburl = "root:123456@tcp(mysql:3306)/iyou"
 )
 
 var DB *sql.DB
 
 func init() {
-	// if config.DBURL == "" { //maybe service don't need DB
-	// 	log.Warn("Ignore DB init")
-	// 	return
-	// }
 	var err error
 	for i := 1; i <= 5; i++ {
 		DB, err = sql.Open("mysql", dburl)
 		if err != nil {
-			log.Fatalf("Connect %s failed: %s; on...: %v", dburl, err, i)
-			//alarm.Notify("nevis_mongodb_ping", 5, "/", err.Error())
+			//log.Fatalf("Connect %s failed: %s; on...: %v", dburl, err, i)
 			time.Sleep(time.Second * 5)
 			continue
 		} else {
