@@ -21,7 +21,14 @@ message Article {
   repeated string images = 4;
   repeated string videos = 5;
   string owner = 6;
-  repeated int32 accesses = 7;
-  google.protobuf.Timestamp created = 8;
-  map<string,string> labels = 9;
+  Location location = 7;
+  repeated int32 accesses = 8;
+  google.protobuf.Timestamp created = 9;
+  map<string,string> labels = 10;
+}
+
+message Location {
+  float latitude = 1;
+  float longitude = 2;
+  string name = 3;
 }
