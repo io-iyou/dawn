@@ -53,7 +53,7 @@ push:image
 	docker push $(IMG_HUB)/$(SERVICE):$(TAG)
 
 run:image
-	@-docker service rm $(SERVICE) > /dev/null 2>&1  || true	
+	-docker service rm $(SERVICE) > /dev/null 2>&1  || true	
 	@docker service create --name $(SERVICE) --network devel $(IMG_HUB)/$(SERVICE):$(TAG)
 
 envoy:

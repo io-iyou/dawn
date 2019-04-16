@@ -20,6 +20,7 @@ func main() {
 	}
 	s := grpc.NewServer()
 	pb.RegisterArticlesServer(s, &impl.ArticlesImpl{})
+	pb.RegisterUsersServer(s, &impl.UsersImpl{})
 
 	log.Println("begin..." + port)
 	if err := s.Serve(lis); err != nil {

@@ -23,8 +23,8 @@ message Article {
   string owner = 6;
   Location location = 7;
   repeated int32 accesses = 8;
-  google.protobuf.Timestamp created = 9;
-  map<string,string> labels = 10;
+  map<string,string> labels = 9;
+  google.protobuf.Timestamp created = 10;  
 }
 
 message Location {
