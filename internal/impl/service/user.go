@@ -15,7 +15,7 @@ const (
 type UsersImpl struct{}
 
 func (s *UsersImpl) Add(ctx context.Context, in *pb.User) (*pb.User, error) {
-	in.Id = types.TimestampNow().String()
+	in.Id = in.Telephone
 	in.Created = types.TimestampNow()
 	if err := biz.Insert(userTable, in); err != nil {
 		return nil, err

@@ -19,8 +19,9 @@ func main() {
 		log.Fatalf("failed to listen: %v", err)
 	}
 	s := grpc.NewServer()
-	pb.RegisterArticlesServer(s, &impl.ArticlesImpl{})
-	pb.RegisterUsersServer(s, &impl.UsersImpl{})
+	pb.RegisterArticlesServer(s, new(impl.ArticlesImpl))
+	pb.RegisterUsersServer(s, new(impl.UsersImpl))
+	pb.RegisterMessagesServer(s, new(impl.MessageImpl))
 
 	log.Println("begin..." + port)
 	if err := s.Serve(lis); err != nil {
