@@ -9,6 +9,8 @@ package dawn;
 service Messages {
   rpc Send (Message) returns (google.protobuf.Empty) {}
   rpc Receive (User) returns (stream Message) {}
+  rpc Publish (TopicRequest) returns (google.protobuf.Empty) {}
+  rpc Subscribe (TopicRequest) returns (stream Message) {}
 }
 
 message Message {
@@ -20,4 +22,9 @@ message Message {
   string from = 6;
   map<string,string> labels = 7;
   google.protobuf.Timestamp created = 8;  
+}
+
+message TopicRequest {
+  string topic = 1;
+  Message msg = 2;
 }

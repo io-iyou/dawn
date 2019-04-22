@@ -10,34 +10,66 @@ import (
 )
 
 var (
-	queqeMap = make(map[string]chan *pb.Message)
+	p2pQueues    = make(map[string]chan *pb.Message)
+	pubsubQueues = make(map[string][]chan *pb.Message)
 )
 
 type MessageImpl struct{}
 
 func (s *MessageImpl) Send(ctx context.Context, in *pb.Message) (*types.Empty, error) {
-	if queue := queqeMap[in.To]; queue == nil {
-		queqeMap[in.To] = make(chan *pb.Message, 100)
+	if p2pQueues[in.To] == nil {
+		p2pQueues[in.To] = make(chan *pb.Message, 100)
 	}
 	fmt.Println("rec:", *in)
 	go func() {
-		queqeMap[in.To] <- in
+		p2pQueues[in.To] <- in
 	}()
 
 	return &types.Empty{}, nil
 }
 
 func (s *MessageImpl) Receive(in *pb.User, stream pb.Messages_ReceiveServer) error {
-	if queue := queqeMap[in.Id]; queue == nil {
-		queqeMap[in.Id] = make(chan *pb.Message, 100)
+	if p2pQueues[in.Id] == nil {
+		p2pQueues[in.Id] = make(chan *pb.Message, 100)
 	}
 
-	for msg := range queqeMap[in.Id] {
+	for msg := range p2pQueues[in.Id] {
 		fmt.Println("send", msg)
 		if err := stream.Send(msg); err != nil {
 			grpclog.Errorln(err)
-			queqeMap[in.Id] <- msg
+			p2pQueues[in.Id] <- msg
 			//return err
+		}
+	}
+
+	return nil
+}
+
+func (s *MessageImpl) Publish(ctx context.Context, in *pb.TopicRequest) (*types.Empty, error) {
+	if pubsubQueues[in.Topic] == nil {
+		pubsubQueues[in.Topic] = []chan *pb.Message{}
+	}
+
+	go func() {
+		for k := range pubsubQueues[in.Topic] {
+			pubsubQueues[in.Topic][k] <- in.Msg
+		}
+	}()
+
+	return nil, nil
+}
+
+func (s *MessageImpl) Subscribe(in *pb.TopicRequest, stream pb.Messages_SubscribeServer) error {
+	if pubsubQueues[in.Topic] == nil {
+		pubsubQueues[in.Topic] = []chan *pb.Message{}
+	}
+
+	queue := make(chan *pb.Message, 100)
+	pubsubQueues[in.Topic] = append(pubsubQueues[in.Topic], queue)
+	for msg := range queue {
+		if err := stream.Send(msg); err != nil {
+			grpclog.Errorln(err)
+			queue <- msg
 		}
 	}
 
